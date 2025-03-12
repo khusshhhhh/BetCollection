@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bet Collection App</title>
+    <!-- You can uncomment the following line if you want to use a Google Font -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"> -->
+    <style>
+        /* Reset & Global Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background: linear-gradient(to right, #e0eafc, #cfdef3);
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            flex: 1;
+            width: 90%;
+            max-width: 800px;
+            background-color: #fff;
+            margin: 30px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        input[type="submit"],
+        button {
+            padding: 12px 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover,
+        button:hover {
+            background-color: #45a049;
+        }
+
+        ul {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        li {
+            background: #f9f9f9;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: #333;
+        }
+
+        p {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive Flex Layout for forms */
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        /* Footer Styles */
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+
+        /* Media Query for Mobile */
+        @media (max-width: 600px) {
+            header {
+                font-size: 1.25rem;
+                padding: 15px;
+            }
+
+            .container {
+                margin: 15px auto;
+                padding: 15px;
+            }
+
+            input[type="submit"],
+            button {
+                font-size: 0.9rem;
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        Bet Collection App
+    </header>
+    <div class="container">
+        <!-- Join View -->
+        <div id="joinView" class="view active">
+            <h2>Join the Game</h2>
+            <form id="joinForm">
+                <div class="form-group">
+                    <label for="joinUsername">Username:</label>
+                    <input type="text" id="joinUsername" required />
+                </div>
+                <div class="form-group">
+                    <label for="startingAmount">Starting Amount:</label>
+                    <input type="number" id="startingAmount" required />
+                </div>
+                <input type="submit" value="Join" />
+            </form>
+            <p id="joinMessage" style="color: red; text-align: center;"></p>
+        </div>
+
+        <!-- Lobby View -->
+        <div id="lobbyView" class="view">
+            <h2>Lobby</h2>
+            <ul id="playersList"></ul>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <button id="startGameButton">Start Game</button>
+                <button id="goToJoin">Add Another Player</button>
+            </div>
+        </div>
+
+        <!-- Game View -->
+        <div id="gameView" class="view">
+            <h2>Game - Round <span id="roundNumber">0</span></h2>
+            <p>Current Pot: <span id="potAmount">0</span></p>
+            <h3 style="text-align: center;">Players</h3>
+            <ul id="gamePlayersList"></ul>
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                <button id="betButton">Place Bet</button>
+                <button id="endRoundButton">End Round</button>
+                <button id="resetButton">Reset Game</button>
+            </div>
+        </div>
+
+        <!-- Bet View -->
+        <div id="betView" class="view">
+            <h2>Place Bet</h2>
+            <form id="betForm">
+                <div class="form-group">
+                    <label for="betPlayer">Select Player:</label>
+                    <select id="betPlayer"></select>
+                </div>
+                <div class="form-group">
+                    <label for="betAmount">Bet Amount:</label>
+                    <input type="number" id="betAmount" required />
+                </div>
+                <input type="submit" value="Place Bet" />
+            </form>
+            <div style="text-align: center;">
+                <button id="backToGameFromBet">Back to Game</button>
+            </div>
+        </div>
+
+        <!-- End Round View -->
+        <div id="endRoundView" class="view">
+            <h2>End Round</h2>
+            <form id="endRoundForm">
+                <div class="form-group">
+                    <label for="winnerSelect">Select Winner:</label>
+                    <select id="winnerSelect"></select>
+                </div>
+                <input type="submit" value="End Round" />
+            </form>
+            <div style="text-align: center;">
+                <button id="backToGameFromEnd">Back to Game</button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2025 Bet Collection App
+    </footer>
+
+    <script>
+        // Global game state
+        const game = {
+            players: {},
+            pot: 0,
+            round: 0,
+            roundActive: false,
+        };
+
+        // Helper to switch active view
+        function showView(viewId) {
+            document.querySelectorAll('.view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+
+        // Render player list in lobby view
+        function renderPlayers() {
+            const playersList = document.getElementById('playersList');
+            playersList.innerHTML = '';
+            for (let username in game.players) {
+                const li = document.createElement('li');
+                li.textContent = username + ' - Balance: ' + game.players[username].balance;
+                playersList.appendChild(li);
+            }
+        }
+
+        // Update game view info
+        function updateGameView() {
+            document.getElementById('roundNumber').textContent = game.round;
+            document.getElementById('potAmount').textContent = game.pot;
+            const gamePlayersList = document.getElementById('gamePlayersList');
+            gamePlayersList.innerHTML = '';
+            for (let username in game.players) {
+                const li = document.createElement('li');
+                li.textContent = username + ' - Balance: ' + game.players[username].balance +
+                    ' - Bet: ' + (game.players[username].bet !== null ? game.players[username].bet : 'Not bet yet');
+                gamePlayersList.appendChild(li);
+            }
+        }
+
+        // Update options for bet and winner selects
+        function updateBetPlayerOptions() {
+            const betPlayerSelect = document.getElementById('betPlayer');
+            betPlayerSelect.innerHTML = '';
+            for (let username in game.players) {
+                const option = document.createElement('option');
+                option.value = username;
+                option.textContent = username;
+                betPlayerSelect.appendChild(option);
+            }
+        }
+        function updateWinnerOptions() {
+            const winnerSelect = document.getElementById('winnerSelect');
+            winnerSelect.innerHTML = '';
+            for (let username in game.players) {
+                const option = document.createElement('option');
+                option.value = username;
+                option.textContent = username;
+                winnerSelect.appendChild(option);
+            }
+        }
+
+        // Join form
+        document.getElementById('joinForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const username = document.getElementById('joinUsername').value.trim();
+            const startingAmount = parseInt(document.getElementById('startingAmount').value, 10);
+            if (!username || isNaN(startingAmount) || startingAmount <= 0) {
+                document.getElementById('joinMessage').textContent = 'Please enter a valid username and starting amount.';
+                return;
+            }
+            if (game.players[username]) {
+                document.getElementById('joinMessage').textContent = 'Username already exists.';
+                return;
+            }
+            game.players[username] = { balance: startingAmount, bet: null };
+            document.getElementById('joinMessage').textContent = 'Player added!';
+            document.getElementById('joinUsername').value = '';
+            document.getElementById('startingAmount').value = '';
+            renderPlayers();
+            updateBetPlayerOptions();
+            updateWinnerOptions();
+            showView('lobbyView');
+        });
+
+        // Button to add another player from lobby
+        document.getElementById('goToJoin').addEventListener('click', function () {
+            showView('joinView');
+        });
+
+        // Start game button in lobby
+        document.getElementById('startGameButton').addEventListener('click', function () {
+            if (Object.keys(game.players).length === 0) {
+                alert('No players available. Please add players.');
+                return;
+            }
+            game.round = 1;
+            game.pot = 0;
+            game.roundActive = true;
+            updateGameView();
+            showView('gameView');
+        });
+
+        // Bet button in game view
+        document.getElementById('betButton').addEventListener('click', function () {
+            updateBetPlayerOptions();
+            showView('betView');
+        });
+
+        // Back button from bet view to game view
+        document.getElementById('backToGameFromBet').addEventListener('click', function () {
+            showView('gameView');
+        });
+
+        // Bet form
+        document.getElementById('betForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const betPlayer = document.getElementById('betPlayer').value;
+            const betAmount = parseInt(document.getElementById('betAmount').value, 10);
+            if (isNaN(betAmount) || betAmount < 0) {
+                alert('Enter a valid bet amount.');
+                return;
+            }
+            const player = game.players[betPlayer];
+            if (betAmount > player.balance) {
+                alert('Bet amount exceeds player balance.');
+                return;
+            }
+            player.balance -= betAmount;
+            player.bet = betAmount;
+            game.pot += betAmount;
+            document.getElementById('betAmount').value = '';
+            updateGameView();
+            updateWinnerOptions();
+            showView('gameView');
+        });
+
+        // End round button in game view
+        document.getElementById('endRoundButton').addEventListener('click', function () {
+            updateWinnerOptions();
+            showView('endRoundView');
+        });
+
+        // Back button from end round view to game view
+        document.getElementById('backToGameFromEnd').addEventListener('click', function () {
+            showView('gameView');
+        });
+
+        // End round form
+        document.getElementById('endRoundForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const winner = document.getElementById('winnerSelect').value;
+            if (!game.players[winner]) {
+                alert('Select a valid winner.');
+                return;
+            }
+            game.players[winner].balance += game.pot;
+            game.pot = 0;
+            for (let username in game.players) {
+                game.players[username].bet = null;
+            }
+            game.round++;
+            updateGameView();
+            updateWinnerOptions();
+            showView('gameView');
+        });
+
+        // Reset game button
+        document.getElementById('resetButton').addEventListener('click', function () {
+            if (confirm('Are you sure you want to reset the game?')) {
+                game.players = {};
+                game.pot = 0;
+                game.round = 0;
+                game.roundActive = false;
+                showView('joinView');
+            }
+        });
+    </script>
+</body>
+
+</html>
